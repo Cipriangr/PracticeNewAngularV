@@ -1,3 +1,8 @@
 <app-places-container title="Your Favorite Places">
-  <p>Todo...</p>
+
+  @if(userPlaces().length > 0) {
+    <app-places [places]="userPlaces()!" (selectPlace)="deletePlace($event)"/>
+  } @else {
+    <p>No favorite places</p>
+  }
 </app-places-container>

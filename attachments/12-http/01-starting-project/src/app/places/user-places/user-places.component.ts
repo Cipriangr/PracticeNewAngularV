@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 
 import { PlacesContainerComponent } from '../places-container/places-container.component';
 import { PlacesComponent } from '../places.component';
@@ -15,18 +15,23 @@ import { Place } from '../place.model';
 export class UserPlacesComponent implements OnInit {
 
   service = inject(PlacesService);
-  userPlaces = signal<Place[]>([]);
+  userPlaces = this.service.loadedUserPlaces;
+  destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.service.loadedUserPlaces().subscribe({
-      next: (value) => {
-        console.log('user-places', value);
-        this.userPlaces.set(value);
+    const subscription = this.service.loadUserPlaces().subscribe({
+      error: (error: Error) => {
+        console.log('!!error', error);
       }
     })
     this.destroyRef.onDestroy(() => {
       subscription.unsubscribe();
     });
+  }
+
+  deletePlace(place: Place) {
+    console.log('!!place', place);
+    this.service.removeUserPlace(place).subscribe();
   }
 
 }
